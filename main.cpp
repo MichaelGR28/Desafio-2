@@ -2,6 +2,7 @@
 #include <list>
 #include <string>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
@@ -9,30 +10,37 @@ using namespace std;
 class Estacion {
     private:
         string nombre;
-        bool transferencia;
+        bool transferencia = false;
+        int numEstConet;
+        vector<string> estacionesConectadas;
+        vector<int> tiempoEstaciones;
     public:
-        Estacion(string _nombre, bool _transferencia);
+        Estacion(string);
         string getNombre();
         bool getTransferencia();
+        void obtenerDatos();
+        vector<string> getEstacionesConectadas();
 };
 
 class Linea {
     private:
         char nombre;
         vector<Estacion> estaciones;
+        vector<vector<int>> tiemposEntreEstaciones;
     public:
         Linea(char _nombre);
         char getNombre();
         void añadirEstacion(Estacion);
         void mostrarEstaciones();
+        void modificarVectorEstaciones(Estacion);
+        void modificarMatrizTiempos(Estacion);
 };
 
 
 //Estacion
 //Constructor
-Estacion::Estacion(string _nombre, bool _transferencia) {
+Estacion::Estacion(string _nombre) {
     nombre = _nombre;
-    transferencia = _transferencia;
 }
 
 //Metodos
@@ -42,6 +50,30 @@ string Estacion::getNombre(){
 
 bool Estacion::getTransferencia(){
     return transferencia;
+}
+
+void Estacion::obtenerDatos() {
+    int num;
+    cout << "A cuantas estaciones va a estar conectada esta estación: ";
+    cin >> num;
+    numEstConet += num;
+    cout << "Ingrese las estaciones a las que se encuentra conectada." << endl;
+    for (int i = 0; i < num; i++) {
+        string nombre;
+        float tiempo;
+        cout << "Ingrese el nombre de la estacion: ";
+        cin >> nombre;
+        cout << "Ingrese el tiempo estimado de viaje: ";
+        cin >> tiempo;
+        estacionesConectadas.push_back(nombre);
+        tiempoEstaciones.push_back(tiempo);
+    }
+    
+    cout << numEstConet << endl;
+}
+
+vector<string> Estacion::getEstacionesConectadas(){
+    return estacionesConectadas;
 }
 
 //Linea
@@ -56,6 +88,8 @@ char Linea::getNombre(){
 }
 
 void Linea::añadirEstacion(Estacion estacion){
+    estacion.obtenerDatos();
+    modificarMatrizTiempos( estacion );
     estaciones.push_back(estacion);
 }
 
@@ -65,17 +99,40 @@ void Linea::mostrarEstaciones(){
     }
 }
 
+void Linea::modificarMatrizTiempos(Estacion estacion){
+    if (estaciones.size() != 0){
+
+    }
+}
+
+void Linea::modificarVectorEstaciones(Estacion estacion){
+    bool val = false;
+    int pos;
+    for (int i = 0; i < estaciones.size(); i++){
+        if (estaciones[i].getNombre() == estacion.getEstacionesConectadas()[0]){
+            val = true;
+            pos = i;
+        }
+    }
+
+    estaciones.insert(estaciones.begin() + pos, estacion.getNombre());
+
+}
+
+//Funciones
+
 
 
 
 int main() {
 
     Linea a('A');
+    string nombre;
+    cout << "Ingresar nombre de la estacion: ";
+    cin >> nombre;
 
-    a.añadirEstacion(Estacion ("Bello", false));
-    a.añadirEstacion(Estacion ("Madera", false));
-    a.añadirEstacion(Estacion ("Niquia", false));
-    a.añadirEstacion(Estacion ("Acevedo", false));
+    a.añadirEstacion(Estacion (nombre));
+    a.añadirEstacion(Estacion (nombre));
 
     a.mostrarEstaciones();
     return 0;

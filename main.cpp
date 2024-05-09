@@ -11,15 +11,12 @@ class Estacion {
     private:
         string nombre;
         bool transferencia = false;
-        int numEstConet;
-        vector<string> estacionesConectadas;
-        vector<int> tiempoEstaciones;
+        vector<char> lineas;
     public:
         Estacion(string);
         string getNombre();
         bool getTransferencia();
-        void obtenerDatos();
-        vector<string> getEstacionesConectadas();
+        void agregarLinea(char);
 };
 
 class Linea {
@@ -32,8 +29,9 @@ class Linea {
         char getNombre();
         void añadirEstacion(Estacion);
         void mostrarEstaciones();
-        void modificarVectorEstaciones(Estacion);
-        void modificarMatrizTiempos(Estacion);
+        void modificarVectorEstaciones(Estacion, int);
+        void modificarMatrizTiempos(Estacion, int, int, int);
+        void mostrarTiempos();
 };
 
 
@@ -52,28 +50,8 @@ bool Estacion::getTransferencia(){
     return transferencia;
 }
 
-void Estacion::obtenerDatos() {
-    int num;
-    cout << "A cuantas estaciones va a estar conectada esta estación: ";
-    cin >> num;
-    numEstConet += num;
-    cout << "Ingrese las estaciones a las que se encuentra conectada." << endl;
-    for (int i = 0; i < num; i++) {
-        string nombre;
-        float tiempo;
-        cout << "Ingrese el nombre de la estacion: ";
-        cin >> nombre;
-        cout << "Ingrese el tiempo estimado de viaje: ";
-        cin >> tiempo;
-        estacionesConectadas.push_back(nombre);
-        tiempoEstaciones.push_back(tiempo);
-    }
-    
-    cout << numEstConet << endl;
-}
-
-vector<string> Estacion::getEstacionesConectadas(){
-    return estacionesConectadas;
+void Estacion::agregarLinea(char linea) {
+    lineas.push_back(linea);
 }
 
 //Linea
@@ -88,9 +66,36 @@ char Linea::getNombre(){
 }
 
 void Linea::añadirEstacion(Estacion estacion){
-    estacion.obtenerDatos();
-    modificarMatrizTiempos( estacion );
-    estaciones.push_back(estacion);
+    estacion.agregarLinea(nombre);
+    int num;
+    cout << "En esta linea hay " << estaciones.size() << " estaciones, indicar en que posicion se ingresara esta estacion: ";
+    cin >> num;
+    cout << estaciones.size() << endl;
+
+    modificarVectorEstaciones(estacion, num);
+
+    if (estaciones.size()-1 != 0){
+        int tiempoIzquierda;
+        int tiempoDerecha;
+        if (num > estaciones.size()-1) {
+            cout << "Cuanto tiempo hay entre la estacion " << estacion.getNombre() << " y la estacion " << estaciones[num-2].getNombre() << endl;
+            cin >> tiempoIzquierda;
+            tiempoDerecha = 0;
+        }
+        else if (num < 2){
+            cout << "Cuanto tiempo hay entre la estacion " << estacion.getNombre() << " y la estacion " << estaciones[num].getNombre() << endl;
+            cin >> tiempoDerecha;
+            tiempoIzquierda = 0;
+        }
+        else{
+            cout << "Cuanto tiempo hay entre la estacion " << estacion.getNombre() << " y la estacion " << estaciones[num-2].getNombre() << endl;
+            cin >> tiempoIzquierda;
+            cout << "Cuanto tiempo hay entre la estacion " << estacion.getNombre() << " y la estacion " << estaciones[num].getNombre() << endl;
+            cin >> tiempoDerecha;
+        }
+        modificarMatrizTiempos(estacion, num, tiempoIzquierda, tiempoDerecha);
+    }
+    mostrarEstaciones();
 }
 
 void Linea::mostrarEstaciones(){
@@ -99,24 +104,42 @@ void Linea::mostrarEstaciones(){
     }
 }
 
-void Linea::modificarMatrizTiempos(Estacion estacion){
-    if (estaciones.size() != 0){
-
+void Linea::modificarMatrizTiempos(Estacion estacion, int pos, int izq, int der){
+    vector<vector<int>> aux;
+    for (int i = 0; i <= (estaciones.size()); i++)
+    {
+        vector<int> fila;
+        for (int j = 0; j < estaciones.size(); j++)
+        {
+            if ((i == pos-2 && j == pos-1) || (i == pos-1 && j == pos-2)){
+                fila.push_back(izq);
+            }
+            else if ((i == pos-1 && j == pos) || (i == pos && j == pos-1)){
+                fila.push_back(der);
+            }
+            else{
+                fila.push_back(0);
+            }
+        }
+        aux.push_back(fila);
     }
+    tiemposEntreEstaciones = aux;
+    mostrarTiempos();
+    
 }
 
-void Linea::modificarVectorEstaciones(Estacion estacion){
-    bool val = false;
-    int pos;
-    for (int i = 0; i < estaciones.size(); i++){
-        if (estaciones[i].getNombre() == estacion.getEstacionesConectadas()[0]){
-            val = true;
-            pos = i;
+void Linea::modificarVectorEstaciones(Estacion estacion, int posicion){
+    estaciones.insert(estaciones.begin() + (posicion-1), estacion);
+
+}
+
+void Linea::mostrarTiempos(){
+    for (vector<int> i : tiemposEntreEstaciones) {
+        for (int j : i) {
+            cout << j << "  ";
         }
+        cout << endl;
     }
-
-    estaciones.insert(estaciones.begin() + pos, estacion.getNombre());
-
 }
 
 //Funciones
@@ -131,9 +154,10 @@ int main() {
     cout << "Ingresar nombre de la estacion: ";
     cin >> nombre;
 
+    a.añadirEstacion(Estacion ("Bello"));
     a.añadirEstacion(Estacion (nombre));
+    cout << "Ingresar nombre de la estacion: ";
+    cin >> nombre;
     a.añadirEstacion(Estacion (nombre));
-
-    a.mostrarEstaciones();
     return 0;
 }

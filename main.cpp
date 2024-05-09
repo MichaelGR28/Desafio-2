@@ -34,6 +34,17 @@ class Linea {
         void mostrarTiempos();
 };
 
+class RedMetro {
+    private:
+        string nombre;
+        vector<Linea> lineas;
+    public:
+        RedMetro(string);
+        string getNombre();
+        vector<Linea> getLineas();
+        void añadirLinea(Linea);
+};
+
 
 //Estacion
 //Constructor
@@ -106,7 +117,7 @@ void Linea::mostrarEstaciones(){
 
 void Linea::modificarMatrizTiempos(Estacion estacion, int pos, int izq, int der){
     vector<vector<int>> aux;
-    for (int i = 0; i <= (estaciones.size()); i++)
+    for (int i = 0; i < (estaciones.size()); i++)
     {
         vector<int> fila;
         for (int j = 0; j < estaciones.size(); j++)
@@ -142,22 +153,71 @@ void Linea::mostrarTiempos(){
     }
 }
 
+//RedMetro
+//Contructor
+RedMetro::RedMetro(string _nombre){
+    nombre = _nombre;
+}
+
+//Metodos
+string RedMetro::getNombre(){
+    return nombre;
+}
+
+vector<Linea> RedMetro::getLineas(){
+    return lineas;
+}
+
+void RedMetro::añadirLinea(Linea linea){
+    lineas.push_back(linea);
+}
+
 //Funciones
-
-
-
+void añadirEstaciones(Linea linea){
+    char crearEstacion;
+    cout << "¿Desea añadir una Estacion a la linea " << linea.getNombre() << "? ponga s si es asi o n si no es asi: ";
+    cin >> crearEstacion;
+    while (crearEstacion == 's'){  
+    string nombre;
+        cout << "Ingresar nombre de la estacion: ";
+        cin >> nombre;
+        linea.añadirEstacion(Estacion (nombre));
+        cout << "¿Quieres crear otra estacion en la misma linea? Poner s si asi lo desea o n si no es asi: ";
+        cin >> crearEstacion;
+    }
+}
 
 int main() {
-
-    Linea a('A');
     string nombre;
-    cout << "Ingresar nombre de la estacion: ";
+    char crearLinea;
+    int count = 0;
+    cout << "Bienvenido al simulador de red metro" << endl;
+    cout << "Digite el nombre de la red: ";
     cin >> nombre;
+    RedMetro red(nombre);
 
-    a.añadirEstacion(Estacion ("Bello"));
-    a.añadirEstacion(Estacion (nombre));
-    cout << "Ingresar nombre de la estacion: ";
-    cin >> nombre;
-    a.añadirEstacion(Estacion (nombre));
+    cout << "¿Desea añadir una linea a esa red? ponga s si es asi o n si no es asi: ";
+    cin >> crearLinea;
+    while (crearLinea == 's'){  
+        char nombreLinea;
+        cout << "Ingresar nombre de la linea, la linea solo debe de ser una sola letra: ";
+        cin >> nombreLinea;
+        red.añadirLinea(Linea (nombreLinea));
+        añadirEstaciones(red.getLineas()[count]);
+        cout << "¿Quieres crear otra linea? Poner s si asi lo desea o n si no es asi: ";
+        cin >> crearLinea;
+        count++;
+    }
+    
+
+    // string nombre;
+    // cout << "Ingresar nombre de la estacion: ";
+    // cin >> nombre;
+
+    // a.añadirEstacion(Estacion ("Bello"));
+    // a.añadirEstacion(Estacion (nombre));
+    // cout << "Ingresar nombre de la estacion: ";
+    // cin >> nombre;
+    // a.añadirEstacion(Estacion (nombre));
     return 0;
 }
